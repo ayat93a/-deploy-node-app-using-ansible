@@ -29,16 +29,24 @@ https://github.com/heroku/node-js-sample.git
 •	Place it inside /home/nodeApp
 ________
 🏃 4. Start the app with PM2:
+
 •	Start the app as the nodeApp user using PM2
+
 •	Make sure PM2 auto-starts on server reboot (hint: pm2 startup)
 ________________________________________
 🛡️ 5. Secure the server:
 •	Install fail2ban to protect against SSH attacks
+
 •	Configure UFW (firewall) to allow only:
+
 o	Port 22 (SSH)
+
 o	Port 80 (HTTP)
+
 •	Enable UFW
 ________________________________________
 ⚙️ 6. Bonus (Optional but High Value):
+
 •	Set the timezone of the server to UTC
+
 •	Make sure node and npm versions are printed at the end of the playbook (as a check)
