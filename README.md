@@ -10,21 +10,26 @@ Your mission is to write an Ansible playbook that does:
 ________________________________________
 🖥️ 1. Install the needed system packages:
 •	Install Node.js (use the official NodeSource repo, not the old Ubuntu one).
+
 •	Install PM2 globally to manage the Node.js app.
+
+ ### I use node js artifact for the project https://github.com/ayat93a/nodeJs-app-for-testing.git
 ________________________________________
 📂 2. Prepare the environment:
-•	Create a Linux user called webadmin
-•	Make sure webadmin has a home directory and can run PM2 apps
+•	Create a Linux user called nodeApp
+
+•	Make sure nodeApp has a home directory and can run PM2 apps
+
 •	Allow passwordless sudo only for service management commands (like restart nginx).
 ________________________________________
 📦 3. Deploy the application:
 •	Clone the app from this GitHub repo:
 https://github.com/heroku/node-js-sample.git
-•	Place it inside /opt/webapp
-•	Change ownership to webadmin
-________________________________________
+### i crete artifact for https://github.com/ayat93a/nodeJs-app-for-testing.git and copy it form the control node to the managed node
+•	Place it inside /home/nodeApp
+________
 🏃 4. Start the app with PM2:
-•	Start the app as the webadmin user using PM2
+•	Start the app as the nodeApp user using PM2
 •	Make sure PM2 auto-starts on server reboot (hint: pm2 startup)
 ________________________________________
 🛡️ 5. Secure the server:
