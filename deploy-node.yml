@@ -1,0 +1,109 @@
+---
+- name: Install requermients to deploy node app
+  hosts: aws
+  become: yes
+  tasks:
+   - name: Update apt
+     apt:
+      update_cache: yes
+      force_apt_get: yes
+      cache_valid_time: 3600
+   - name: install node repo for version 20
+     get_url:
+       url: https://deb.nodesource.com/setup_20.x
+       dest: /home/ubuntu
+       mode: '0775'
+   - name: Install pm2 globally
+     npm:
+       name: pm2
+       global: yes
+   - name: Run nodeSource script
+     command: bash /home/ubuntu/setup_20.x
+   - name: install node
+     apt:
+      name: nodejs
+      state: present
+      update_cache: yes
+- name: Create a new user for the node app
+  hosts: aws
+  become: yes
+  tasks:
+   - name: Create the node user
+     user:
+       name: nodeApp
+       group: admin
+- name: Add ubuntu user to admin group which is the user i used to login using ssh
+  hosts: aws
+  become: yes
+  tasks:
+   - name: append ubuntu to admin grp
+     user:
+       name: ubuntu
+       groups: admin
+       append: yes
+- name: Move the artifact and untar
+  hosts: aws
+  become: yes
+  tasks:
+   - name: move the node artifact from the control node to managed node
+     copy:
+      src: /home/ubuntu/my-express-app.tar.gz
+      dest: /home/ubuntu/my-express-app.tar.gz
+      owner: ubuntu
+      group: ubuntu
+      mode: '0775'
+   - name: make directory
+     file:
+      path: /home/nodeApp/my-express-app
+      state: directory
+      owner: nodeApp
+      group: admin
+      mode: '0775'
+   - name: unpack node app
+     unarchive:
+      src: /home/ubuntu/my-express-app.tar.gz
+      dest: /home/nodeApp/my-express-app
+      owner: nodeApp
+      group: admin
+      remote_src: yes
+- name:  deploy the node app
+  hosts: aws
+  become_user: nodeApp
+  tasks:
+   - name: install dependencies
+     npm:
+       path: /home/nodeApp/my-express-app
+   - name: start the app
+     shell: |
+       if pm2 describe my-express-app > /dev/null; then
+         pm2 restart my-express-app
+       else
+         pm2 start app.js --name "my-express-app"
+       fi
+     args:
+       chdir: /home/nodeApp/my-express-app
+     become_user: nodeApp
+   - name: save the app status in variable to check the app health
+     shell: pm2 list
+     register: app_status
+   - name: check if the app is running
+     debug:
+       msg: the app is running. app status is "{{ app_status.stdout | regex_search('my-express-app.*online') }}"
+     when: "'online' in app_status.stdout "
+   - name: check if the app is not running
+     debug:
+       msg: app is not running "{{ app_status.stdout | regex_search('my-express-app.*online') }}"
+     when: "'online' not in app_status.stdout "
+- name: Secure the server
+  hosts: aws
+  become: yes
+  tasks:
+   - name: Install fail2ban to protect against SSH attacks
+     apt:
+      name: fail2ban
+      state: present
+      update_cache: yes
+   - name: run fail2ban  as a service
+     service:
+       name: fail2ban
+       state: started
