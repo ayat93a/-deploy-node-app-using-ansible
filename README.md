@@ -9,6 +9,7 @@ They want you to automate the deployment to a new Ubuntu server.
 Your mission is to write an Ansible playbook that does:
 ________________________________________
 🖥️ 1. Install the needed system packages:
+
 •	Install Node.js (use the official NodeSource repo, not the old Ubuntu one).
 
 •	Install PM2 globally to manage the Node.js app.
