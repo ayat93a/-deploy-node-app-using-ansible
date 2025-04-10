@@ -51,3 +51,10 @@ ________________________________________
 •	Set the timezone of the server to UTC
 
 •	Make sure node and npm versions are printed at the end of the playbook (as a check)
+
+________________________________________
+
+### How to run this project 
+Run this in the control node where ansible is installed 
+
+ansible-playbook deploy-node.yml 
